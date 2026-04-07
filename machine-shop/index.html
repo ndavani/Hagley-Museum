@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- CHANGE: Update page title to match your exhibit name -->
   <title>Machine Shop 360° — Hagley Museum & Library</title>
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@300;400&display=swap" rel="stylesheet" />
   <style>
@@ -199,12 +200,18 @@
  
   <div class="intro-rule"></div>
   <p class="intro-label">Hagley Museum &amp; Library</p>
+  <!-- CHANGE: Main exhibit title shown large on the page -->
   <h1>The Machine Shop</h1>
   <div class="intro-divider"></div>
+  <!-- CHANGE: Short description shown below the title -->
   <p class="intro-sub">A 360° tour of the Hagley Museum machine shop. Tap the thumbnail to watch the full experience on YouTube.</p>
- 
+ <!-- CHANGE: Update the href to your YouTube video URL
+               e.g. href="https://www.youtube.com/watch?v=YOUR_VIDEO_ID" -->
   <a class="video-card" href="https://www.youtube.com/watch?v=VeMuDYm6fXw" target="_blank" rel="noopener noreferrer" style="text-decoration:none; display:block;">
     <div class="video-wrap">
+      <!-- CHANGE: Update both instances of the video ID in this src URL
+                   Replace VeMuDYm6fXw with your YouTube video ID
+                   The video ID is the part after ?v= in the YouTube URL -->
       <img
         id="yt-thumb"
         src="https://img.youtube.com/vi/VeMuDYm6fXw/hqdefault.jpg"
@@ -221,6 +228,7 @@
       </div>
     </div>
     <div class="video-toolbar">
+      <!-- CHANGE: Update this label to describe the type of content e.g. "Historic Tour" or "360° Exhibit View" -->
       <span class="toolbar-label">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
@@ -238,8 +246,8 @@
   </a>
  
   <script>
-    // YouTube's public image URLs sometimes return a grey placeholder for
-    // videos with custom thumbnails. Use the oEmbed API to get the real one.
+   // CHANGE: Update this to your YouTube video ID (the part after ?v= in the URL)
+    // e.g. for https://www.youtube.com/watch?v=ABC123 the ID is ABC123
     const videoId = 'VeMuDYm6fXw';
     const thumb = document.getElementById('yt-thumb');
  
@@ -247,11 +255,11 @@
       .then(r => r.json())
       .then(data => {
         if (data.thumbnail_url) {
-          // oEmbed returns hqdefault — upgrade to maxresdefault and fall back if missing
+         
           const maxres = data.thumbnail_url.replace('hqdefault', 'maxresdefault');
           const testImg = new Image();
           testImg.onload = () => {
-            // Maxres loaded fine (not a 120x90 placeholder)
+         
             if (testImg.width > 200) thumb.src = maxres;
             else thumb.src = data.thumbnail_url;
           };
@@ -268,6 +276,7 @@
      CONFIG
   ========================= */
   const SCRIPT_URL      = "https://script.google.com/macros/s/AKfycbzm0wgH5Tdlz8KEGJcXRE4jif9Rxn_Ma3Vf_Dn-RhwMbKAT1LnZvLIs0uM1gts01k6rIQ/exec";
+  // CHANGE: This is what appears in the "Exhibit Name" column in Airtable — make it unique per exhibit
   const EXHIBIT_NAME    = "Machine Shop";
   const WEATHER_API_KEY = "e23c0a18cd0744e940f5020207c57793";
   const LAT = 39.7496;
