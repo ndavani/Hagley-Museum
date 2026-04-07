@@ -264,13 +264,18 @@
       });
   </script>
   <script>
-  // ── LOGGING CONFIG ────────────────────────────────────────────────────────
+  /* =========================
+     CONFIG
+  ========================= */
   const SCRIPT_URL      = "https://script.google.com/macros/s/AKfycbzm0wgH5Tdlz8KEGJcXRE4jif9Rxn_Ma3Vf_Dn-RhwMbKAT1LnZvLIs0uM1gts01k6rIQ/exec";
-  const EXHIBIT_NAME    = "Machine Shop";
+  const EXHIBIT_NAME    = "Birkenhead Rolling Wheels";
   const WEATHER_API_KEY = "e23c0a18cd0744e940f5020207c57793";
   const LAT = 39.7496;
   const LON = -75.6206;
 
+  /* =========================
+     SEND SCAN TO APPS SCRIPT
+  ========================= */
   function sendScan(weatherType, temperature) {
     const payload = {
       exhibit: EXHIBIT_NAME,
@@ -278,6 +283,7 @@
       temperature: temperature,
       apiKey: "hagley-mill-2026"
     };
+    console.log("Sending:", payload);
     fetch(SCRIPT_URL, {
       method: "POST",
       mode: "no-cors",
@@ -286,37 +292,29 @@
     });
   }
 
+  /* =========================
+     GET WEATHER FROM OPENWEATHER
+  ========================= */
   function logScan() {
     const weatherURL =
       `https://api.openweathermap.org/data/2.5/weather?lat=${LAT}&lon=${LON}&units=imperial&appid=${WEATHER_API_KEY}`;
     fetch(weatherURL)
-      .then(r => { if (!r.ok) throw new Error("Weather failed"); return r.json(); })
+      .then(response => {
+        if (!response.ok) throw new Error("Weather request failed with status " + response.status);
+        return response.json();
+      })
       .then(data => {
+        if (!data.main || !data.weather || !data.weather.length) throw new Error("Weather response missing fields");
         const temperature = Math.round(data.main.temp) + "°F";
         const weatherType = data.weather[0].description;
         sendScan(weatherType, temperature);
       })
-      .catch(() => sendScan("WEATHER_ERROR", "-1°F"));
+      .catch(error => {
+        console.error("Weather error:", error);
+        sendScan("WEATHER_ERROR", "-1°F");
+      });
   }
 
-  
-  const videoId = 'VeMuDYm6fXw';
-  const thumb = document.getElementById('yt-thumb');
-
-  fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`)
-    .then(r => r.json())
-    .then(data => {
-      if (data.thumbnail_url) {
-        const maxres = data.thumbnail_url.replace('hqdefault', 'maxresdefault');
-        const testImg = new Image();
-        testImg.onload = () => { thumb.src = testImg.width > 200 ? maxres : data.thumbnail_url; };
-        testImg.onerror = () => { thumb.src = data.thumbnail_url; };
-        testImg.src = maxres;
-      }
-    })
-    .catch(() => {});
-
-  logScan();
 </script>
 </body>
 </html>
