@@ -102,18 +102,10 @@
     .view-btn svg { width: 14px; height: 14px; }
     #viewer {
       position: fixed; inset: 0;
-      display: flex;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       background: transparent;
       overflow: hidden;
       z-index: 1;
-
-    /* CHANGE: Controls vertical position of the image on screen.
-     padding-bottom pushes the image upward toward the middle.
-     Increase padding-bottom to move image higher, decrease to move it lower.
-     Current setting places it between center and bottom. */
-      align-items: center;
-      padding-bottom: 25vh;
     }
     #exhibit-img {
       display: block;
@@ -125,6 +117,11 @@
       mix-blend-mode: screen;
       z-index: 2;
       position: relative;
+
+    /* CHANGE: moves the image down from center toward the bottom.
+     Increase this number to move lower, decrease to move higher.
+     0 = dead center, 20vh = slightly below center (recommended start) */
+      margin-top: 20vh;
     }
     #camera-denied {
       display: none;
