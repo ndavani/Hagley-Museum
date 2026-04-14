@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- CHANGE: Update page title to match your exhibit name -->
   <title>Eagle Roll Mill Turbine — Hagley Museum & Library</title>
+
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@300;400&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -170,28 +173,47 @@
 <body>
 
   <div class="intro-rule"></div>
+
+  <!-- CHANGE: Museum or institution name shown at the top of the page -->
   <p class="intro-label">Hagley Museum &amp; Library</p>
+
+  <!-- CHANGE: Main exhibit title shown large on the page -->
   <h1>Eagle Roll Mill Turbine</h1>
+
   <div class="intro-divider"></div>
+
+  <!-- CHANGE: Short description shown below the title -->
   <p class="intro-sub">A 360° tour of the Eagle Roll Mill Turbine. Tap the thumbnail to watch the full experience on YouTube.</p>
 
+  <!-- CHANGE: Update the href to your YouTube video URL
+               e.g. href="https://www.youtube.com/watch?v=YOUR_VIDEO_ID" -->
   <a class="video-card" href="https://www.youtube.com/watch?v=yqLuimEJJoc" target="_blank" rel="noopener noreferrer" style="text-decoration:none; display:block;">
     <div class="video-wrap">
+
+      <!-- CHANGE: Update both instances of the video ID in this src URL
+                   Replace yqLuimEJJoc with your YouTube video ID
+                   The video ID is the part after ?v= in the YouTube URL -->
       <img
         id="yt-thumb"
         src="https://img.youtube.com/vi/yqLuimEJJoc/hqdefault.jpg"
         alt="Eagle Roll Mill Turbine — 360° Tour"
       />
+
       <div class="play-overlay">
         <div class="play-btn">
           <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M8 5v14l11-7z"/>
           </svg>
         </div>
+
+        <!-- CHANGE: Update this label to describe your video type e.g. "Watch Video" or "360° Tour" -->
         <span class="play-label">Watch on YouTube · 360°</span>
+
       </div>
     </div>
     <div class="video-toolbar">
+
+      <!-- CHANGE: Update this label to describe the type of content e.g. "Historic Tour" or "360° Exhibit View" -->
       <span class="toolbar-label">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
@@ -199,19 +221,24 @@
         </svg>
         360° Exhibit View
       </span>
+
       <span class="yt-link">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/>
         </svg>
         Watch on YouTube
       </span>
+
     </div>
   </a>
 
   <script>
+    // CHANGE: Update this to your YouTube video ID (the part after ?v= in the URL)
+    // e.g. for https://www.youtube.com/watch?v=ABC123 the ID is ABC123
     const videoId = 'yqLuimEJJoc';
     const thumb = document.getElementById('yt-thumb');
 
+    // Automatically loads the best available thumbnail — no changes needed below
     fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`)
       .then(r => r.json())
       .then(data => {
@@ -227,6 +254,68 @@
         }
       })
       .catch(() => {});
+  </script>
+
+  <script>
+    /* =========================
+       CHANGE: CONFIG
+       These are the only values you need to update for a new exhibit
+    ========================= */
+
+    // Your Google Apps Script URL — same for all exhibits unless you create a new one
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzm0wgH5Tdlz8KEGJcXRE4jif9Rxn_Ma3Vf_Dn-RhwMbKAT1LnZvLIs0uM1gts01k6rIQ/exec";
+
+    // CHANGE: This is what appears in the "Exhibit Name" column in Airtable — make it unique per exhibit
+    const EXHIBIT_NAME = "Eagle Roll Mill Turbine";
+
+    // Your OpenWeather API key — same for all exhibits
+    const WEATHER_API_KEY = "e23c0a18cd0744e940f5020207c57793";
+
+    // Museum GPS coordinates — same for all exhibits at Hagley
+    const LAT = 39.7496;
+    const LON = -75.6206;
+
+    /* =========================
+       NO CHANGES NEEDED BELOW THIS LINE
+    ========================= */
+
+    function sendScan(weatherType, temperature) {
+      const payload = {
+        exhibit: EXHIBIT_NAME,
+        weather: weatherType,
+        temperature: temperature,
+        apiKey: "hagley-2026"
+      };
+      console.log("Sending:", payload);
+      fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+    }
+
+    function logScan() {
+      const weatherURL =
+        `https://api.openweathermap.org/data/2.5/weather?lat=${LAT}&lon=${LON}&units=imperial&appid=${WEATHER_API_KEY}`;
+      fetch(weatherURL)
+        .then(response => {
+          if (!response.ok) throw new Error("Weather request failed with status " + response.status);
+          return response.json();
+        })
+        .then(data => {
+          if (!data.main || !data.weather || !data.weather.length) throw new Error("Weather response missing fields");
+          const temperature = Math.round(data.main.temp) + "°F";
+          const weatherType = data.weather[0].description;
+          sendScan(weatherType, temperature);
+        })
+        .catch(error => {
+          console.error("Weather error:", error);
+          sendScan("WEATHER_ERROR", "-1°F");
+        });
+    }
+
+    logScan();
   </script>
 </body>
 </html>
