@@ -499,6 +499,10 @@
   document.addEventListener("touchend", e => {
     if (e.touches.length < 2) initialPinchDist = null;
   });
+    // Show the iOS hint only on Safari iPhone
+  if (/iphone|ipad/i.test(navigator.userAgent) && !navigator.standalone) {
+    document.getElementById("ios-hint").style.display = "block";
+  }
 </script>
 </body>
 </html>
