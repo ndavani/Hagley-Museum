@@ -26,46 +26,6 @@
       overflow: hidden;
       touch-action: none;
     }
-
-    /* ── LANDSCAPE LOCK ──────────────────────────────────────────────────────
-       This exhibit is designed for landscape (horizontal) mode.
-       If the visitor is in portrait, a rotate prompt is shown instead. */
-    #rotate-prompt {
-      display: none;
-      position: fixed; inset: 0;
-      background: var(--light-bg);
-      z-index: 200;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 1rem;
-    }
-    #rotate-prompt svg {
-      width: 64px; height: 64px;
-      stroke: var(--steel); fill: none; stroke-width: 1.5;
-    }
-    #rotate-prompt p {
-      font-family: "Source Sans 3", sans-serif;
-      font-size: 13px; letter-spacing: 0.08em;
-      color: var(--steel); text-align: center;
-      max-width: 240px; line-height: 1.7;
-    }
-    #rotate-prompt .rotate-label {
-      font-size: 10px; letter-spacing: 0.28em;
-      text-transform: uppercase; color: var(--navy);
-    }
-
-    /* Show rotate prompt in portrait, hide everything else */
-    @media (orientation: portrait) {
-      #rotate-prompt  { display: flex; }
-      #intro          { display: none !important; }
-      #viewer         { display: none !important; }
-      #hud            { display: none !important; }
-      #hud-top        { display: none !important; }
-      #tap-hint       { display: none !important; }
-      #camera-denied  { display: none !important; }
-    }
-
     #camera-feed {
       position: fixed; inset: 0;
       width: 100%; height: 100%;
@@ -227,17 +187,6 @@
 </head>
 <body>
 
-<!-- Shown when phone is in portrait mode — asks visitor to rotate to landscape -->
-<div id="rotate-prompt">
-  <svg viewBox="0 0 24 24">
-    <rect x="5" y="2" width="14" height="20" rx="2"/>
-    <path d="M12 18h.01"/>
-    <path d="M2 12h20M17 7l5 5-5 5" stroke-linecap="round" stroke-linejoin="round"/>
-  </svg>
-  <span class="rotate-label">Rotate your phone</span>
-  <p>Please turn your phone to landscape (horizontal) mode to view this exhibit.</p>
-</div>
-
 <video id="camera-feed" autoplay playsinline muted></video>
 
 <div id="intro">
@@ -253,7 +202,7 @@
   <div class="intro-divider"></div>
 
   <!-- CHANGE: Short description shown below the title on the intro screen -->
-  <p class="intro-sub">Hold your phone up toward the exhibit. The workers will appear over what you see around you.</p>
+  <p class="intro-sub">Hold your phone sideways toward the exhibit. The workers will appear over what you see around you.</p>
 
   <div class="distance-group">
     <span class="distance-label">How far are you standing?</span>
@@ -277,9 +226,10 @@
   <!-- CHANGE: src should match your image filename exactly (case sensitive)
                The image file must be in the same folder as this index.html
                Best results with images that have a black background
-               Since this is a people photo, remove the background using
+               Since this is a people/scene photo, remove the background using
                a tool like remove.bg and place on a black canvas before uploading
-               Save as a .png file e.g. blacksmith_shop.png -->
+               Save as a .png file e.g. blacksmith_pic.png
+               Use a wide/landscape cropped image for best results in landscape mode -->
   <img id="exhibit-img" src="blacksmith_pic.png" alt="Blacksmith Shop workers" />
 </div>
 
@@ -350,6 +300,26 @@
   let viewingDistFt = 5;
   let hudVisible = true;
   let hudTimer = null;
+
+  /* =========================
+     LANDSCAPE LOCK
+     Called when visitor taps View Exhibit — switches to landscape mode.
+     When they tap Back it releases the lock and returns to portrait.
+     The intro screen works in whatever orientation the phone is naturally held.
+  ========================= */
+  function lockLandscape() {
+    if (screen.orientation && screen.orientation.lock) {
+      screen.orientation.lock("landscape").catch(() => {
+        // Some browsers don't support lock — fails silently, visitor just holds phone sideways
+      });
+    }
+  }
+
+  function unlockOrientation() {
+    if (screen.orientation && screen.orientation.unlock) {
+      screen.orientation.unlock();
+    }
+  }
 
   /* =========================
      SEND SCAN TO APPS SCRIPT
@@ -439,6 +409,7 @@
   function enterViewer() {
     applyScale(viewingDistFt);
     document.getElementById("intro").classList.add("hidden");
+    lockLandscape(); // switch to landscape when visitor taps View Exhibit
     startCamera();
     showHud();
     setTimeout(() => document.getElementById("tap-hint").classList.add("gone"), 3000);
@@ -446,6 +417,7 @@
 
   function backToIntro() {
     stopCamera();
+    unlockOrientation(); // release landscape lock when going back to intro
     document.getElementById("intro").classList.remove("hidden");
   }
 
